@@ -1,0 +1,19 @@
+
+
+sub status {
+	warn Dumper @_;
+	return;
+}
+
+
+
+1;
+__END__
+
+
+       #"CF" => sub {
+        #"Queue" => sub {
+        #"TicketSQL" => sub {
+
+
+1;

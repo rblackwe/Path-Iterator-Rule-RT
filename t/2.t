@@ -5,6 +5,8 @@ use 5.010;
 use strict;
 use warnings;
 pass;
+done_testing;
+exit;
 
 use lib './lib';
 use Path::Iterator::Rule;
