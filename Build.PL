@@ -8,7 +8,6 @@ my $builder = Module::Build->new(
     license             => 'Artistic_2_0',
     dist_author         => q{Robert Blackwell <robert@robertblackwell.com>},
     dist_version_from   => 'lib/Path/Iterator/Rule/RT.pm',
-    release_status      => 'stable',
     configure_requires => {
         'Module::Build' => 0,
     },
