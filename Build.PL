@@ -15,10 +15,16 @@ my $builder = Module::Build->new(
         'Test::More' => 0,
     },
     requires => {
-	RT::Client::REST => 0.45,
+	'Path::Iterator::Rule' => 1.008,
+	'RT::Client::REST' => 0.45,
     },
     add_to_cleanup     => [ 'Path-Iterator-Rule-RT-*' ],
     create_makefile_pl => 'traditional',
+    meta_merge => {
+    	resources => {
+            repository => 'https://github.com/rblackwe/Path-Iterator-Rule-RT'
+    	}
+	},
 );
 
 $builder->create_build_script();

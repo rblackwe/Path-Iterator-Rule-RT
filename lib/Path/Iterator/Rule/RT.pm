@@ -8,19 +8,47 @@ use Path::Iterator::Rule;
 use Error qw(:try);
 use RT::Client::REST;
 use RT::Client::REST::Ticket;
-my $config = parse_config_file( $ENV{HOME} . "/.rtrc" );
-my ( $username, $password, $server ) =
+
+my $config_file = $ENV{HOME} . "/.rtrc";
+
+my $config;
+
+my $rt;
+
+sub import {
+    my $package = shift;
+    if (@_ % 2) {
+        die "${package}::import expects an even number of arguments, if any";
+    }
+    my %args =  @_;
+    if ($args{config_file}) {
+        $config_file = $args{config_file};
+    }
+}
+
+# lazy builder for the RT client in $rt and the configuration in $config
+sub _rt {
+    unless ($rt) {
+        $config = parse_config_file( $config_file );
+
+        my ( $username, $password, $server ) =
   ( $config->{user}, $config->{passwd}, $config->{server} );
-my $rt = RT::Client::REST->new(
+
+        $rt = RT::Client::REST->new(
     server  => $server,
     timeout => 30,
-);
-try {
+        );
+
+        try {
     $rt->login( username => $username, password => $password );
-}
-catch Exception::Class::Base with {
+        }
+        catch Exception::Class::Base with {
     die "problem logging in: ", shift->message;
-};
+        };
+    }
+
+    return $rt;
+}
 
 Path::Iterator::Rule->add_helper(
     "status" => sub {
@@ -58,13 +86,15 @@ Path::Iterator::Rule::RT - Extends Path::Iterator::Rule with custom rule subrout
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
+
+    use Path::Iterator::Rule::RT;
 
     my $rule = Path::Iterator::Rule->new;
     $rule->status("resolved");
@@ -96,7 +126,7 @@ sub check_owner {
     my $ticket;
     try {
         $ticket = RT::Client::REST::Ticket->new(
-            rt => $rt,
+            rt => _rt(),
             id => $id,
         )->retrieve;
     }
@@ -119,7 +149,7 @@ sub check_status {
     my $ticket;
     try {
         $ticket = RT::Client::REST::Ticket->new(
-            rt => $rt,
+            rt => _rt(),
             id => $id,
         )->retrieve;
     }
@@ -131,7 +161,6 @@ sub check_status {
 }
 
 =head2 check_ticketSQL
-
 
 $rule->TicketSQL("Queue='General' AND Created = 'yesterday'");
 
@@ -153,7 +182,7 @@ sub check_ticketSQL {
     my $query = "id=$id AND ";
     $query .= $TicketSQL;
 
-    my @ids = $rt->search(
+    my @ids = rt()->search(
         type  => 'ticket',
         query => $query,
     );
@@ -171,7 +200,7 @@ sub parse_config_file {
     my ($file) = @_;
     local $_;
 
-    open( my $handle, '<', $file ) or die "$!";
+    open( my $handle, '<', $file ) or die "Error opening '$file' for reading: $!";
 
     while (<$handle>) {
         chomp;
@@ -188,6 +217,15 @@ sub parse_config_file {
 
     return \%cfg;
 }
+
+=head1 IMPORT
+
+By default this module searches for RT client configuration in F<$HOME/.rtrc>
+
+You can override the location by importing the module like so
+
+    use Path::Iterator::Rule::RT config_file => '/path/to/config/file';
+
 
 =head1 AUTHOR
 
