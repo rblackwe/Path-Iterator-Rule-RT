@@ -86,11 +86,11 @@ Path::Iterator::Rule::RT - Extends Path::Iterator::Rule with custom rule subrout
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -238,6 +238,14 @@ the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Path-Itera
 automatically be notified of progress on your bug as I make changes.
 
 
+=head2 Source Code
+
+This is open source software.  The code repository is available for
+public review and contribution under the terms of the license.
+
+L<https://github.com/rblackwe/Path-Iterator-Rule-RT>
+
+  git clone https://github.com/rblackwe/Path-Iterator-Rule-RT.git
 
 
 =head1 SUPPORT

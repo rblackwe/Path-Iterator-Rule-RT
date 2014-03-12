@@ -20,7 +20,7 @@ my $builder = Module::Build->new(
     },
     add_to_cleanup     => [ 'Path-Iterator-Rule-RT-*' ],
     create_makefile_pl => 'traditional',
-    meta_merge => {
+    meta_add => {
     	resources => {
             repository => 'https://github.com/rblackwe/Path-Iterator-Rule-RT'
     	}
