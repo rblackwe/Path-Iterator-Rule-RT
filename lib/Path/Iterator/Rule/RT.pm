@@ -86,11 +86,11 @@ Path::Iterator::Rule::RT - Extends Path::Iterator::Rule with custom rule subrout
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -135,6 +135,29 @@ sub check_owner {
     };
     return unless $ticket;
     return $owner eq $ticket->owner;
+}
+
+=head2 check_subject
+
+$rule->subject("Foo");
+
+=cut
+
+sub check_subject{
+    my ( $id, $subject) = @_;
+    return unless $id =~ m/^\d+$/;
+    my $ticket;
+    try {
+        $ticket = RT::Client::REST::Ticket->new(
+            rt => _rt(),
+            id => $id,
+        )->retrieve;
+    }
+    catch Exception::Class::Base with {
+        return;
+    };
+    return unless $ticket;
+    return $subject eq $ticket->subject;
 }
 
 =head2 check_status
